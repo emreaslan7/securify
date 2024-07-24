@@ -5,9 +5,9 @@ import bcrypt from "bcryptjs";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, password } = body;
+    const { name, email, password, circleUserId } = body;
 
-    if (!email || !password) {
+    if (!email || !password || !name || !circleUserId) {
       return new NextResponse("Missing credentials", { status: 400 });
     }
 
@@ -23,6 +23,8 @@ export async function POST(req: Request) {
 
     const newUser = await prisma.user.create({
       data: {
+        name,
+        circleUserId,
         email,
         password: hashedPassword,
       },

@@ -23,8 +23,12 @@ import { SignupFormSchema } from "@/schemas/index";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { create_user_account } from "@/actions/createUser";
+import useExecuteChallenge from "@/hooks/useExecuteChallenge";
 
 export const SignUpForm = () => {
+  const { executeChallenge, error, result } = useExecuteChallenge();
+
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
@@ -47,8 +51,28 @@ export const SignUpForm = () => {
     setLoading(true);
     console.log(values);
     try {
+      const response = await create_user_account();
+      if (!response) return;
+      if (
+        !response.userToken ||
+        !response.encryptionKey ||
+        !response.challengeId
+      ) {
+        console.error("Missing userToken, encryptionKey or challengeId");
+        return;
+      }
+
+      const result = executeChallenge(
+        response.userToken,
+        response.encryptionKey,
+        response.challengeId
+      );
+
+      if (!result) return;
+
       await axios.post("/api/register", {
         name: values.name,
+        circleUserId: response.userId,
         email: values.email,
         password: values.password,
       });
@@ -153,3 +177,10 @@ export const SignUpForm = () => {
     </div>
   );
 };
+function executeChallenge(
+  userToken: string,
+  encryptionKey: string,
+  challengeId: any
+) {
+  throw new Error("Function not implemented.");
+}
