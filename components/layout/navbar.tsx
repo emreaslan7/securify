@@ -22,6 +22,8 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { ToggleTheme } from "./toogle-theme";
+import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
 interface RouteProps {
   href: string;
@@ -71,6 +73,15 @@ const featureList: FeatureProps[] = [
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const pathname = usePathname();
+  const session = useSession();
+
+  console.log("Session:", session.data?.user?.email);
+
+  if (pathname === "/signin" || pathname === "/signup") {
+    return null;
+  }
+
   return (
     <header className="shadow-inner bg-opacity-15 w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl top-5 mx-auto sticky border border-secondary z-40 rounded-2xl flex justify-between items-center p-2 bg-card">
       <Link href="/" className="font-bold text-lg flex items-center">
@@ -172,9 +183,8 @@ export const Navbar = () => {
         </NavigationMenuList>
       </NavigationMenu>
 
-      <div className="hidden lg:flex">
+      <div className="hidden lg:flex lg:space-x-3">
         <ToggleTheme />
-
         <Button asChild size="sm" variant="ghost" aria-label="View on GitHub">
           <Link
             aria-label="View on GitHub"
@@ -184,6 +194,34 @@ export const Navbar = () => {
             <Github className="size-5" />
           </Link>
         </Button>
+
+        {/* CREATE Sign in sign up buttons */}
+
+        {session.data?.user ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              signOut();
+            }}
+          >
+            <p>Logout</p>
+          </Button>
+        ) : (
+          <>
+            <Button asChild size="sm" variant="ghost" aria-label="Sign in">
+              <Link aria-label="Sign in" href="/signin">
+                Sign in
+              </Link>
+            </Button>
+
+            <Button asChild size="sm" variant="default" aria-label="Sign up">
+              <Link aria-label="Sign up" href="/signup">
+                Sign up
+              </Link>
+            </Button>
+          </>
+        )}
       </div>
     </header>
   );
