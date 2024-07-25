@@ -32,7 +32,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newUser);
   } catch (error: any) {
-    console.log("Register error:", error);
     return new NextResponse(error, { status: 500 });
   }
 }

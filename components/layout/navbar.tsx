@@ -76,8 +76,6 @@ export const Navbar = () => {
   const pathname = usePathname();
   const session = useSession();
 
-  console.log("Session:", session.data?.user?.email);
-
   if (pathname === "/signin" || pathname === "/signup") {
     return null;
   }

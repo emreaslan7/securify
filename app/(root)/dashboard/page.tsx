@@ -7,7 +7,7 @@ import {
   DollarSign,
   ArrowLeftRightIcon,
 } from "lucide-react";
-import SalesCard, { SalesProps } from "@/components/sales-card";
+import LastTransactions from "@/components/last-transactions";
 import {
   getCircleAllTokenBalances,
   getCircleTokenBalances,
@@ -44,34 +44,6 @@ const cardData: CardProps[] = [
   // },
 ];
 
-const userSalesData: SalesProps[] = [
-  {
-    name: "Olivia Martin",
-    email: "olivia.martin@email.com",
-    salesAmount: "+$1,999.00",
-  },
-  {
-    name: "Jackson Lee",
-    email: "isabella.nguyen@email.com",
-    salesAmount: "+$1,999.00",
-  },
-  {
-    name: "Isabella Nguyen",
-    email: "isabella.nguyen@email.com",
-    salesAmount: "+$39.00",
-  },
-  {
-    name: "William Kim",
-    email: "will@email.com",
-    salesAmount: "+$299.00",
-  },
-  {
-    name: "Sofia Davis",
-    email: "sofia.davis@email.com",
-    salesAmount: "+$39.00",
-  },
-];
-
 export default async function DashboardPage() {
   // getCircleWalletsList("de00db2b-b9e2-4049-934c-e0a90eee3020");
   // getCircleWallet(
@@ -93,8 +65,10 @@ export default async function DashboardPage() {
   cardData[0].amount = `${totalBalance.toString()} $`;
 
   const transactions = await getCircleTransactionsList(
-    "473b0e76-19a5-43c0-8bed-7d851a4ee9da"
+    "473b0e76-19a5-43c0-8bed-7d851a4ee9da",
+    true
   );
+  console.log(transactions);
   cardData[1].amount = `+${transactions.length.toString()}`;
 
   return (
@@ -119,17 +93,30 @@ export default async function DashboardPage() {
         </CardContent>
         <CardContent className="flex justify-between gap-4">
           <section>
-            <p>Last Transactions</p>
+            <p>Last 5 Transactions</p>
             <p className="text-sm text-gray-400">
-              You made 265 sales this month.
+              {`You made ${transactions.length} transactions in the last month`}
             </p>
           </section>
-          {userSalesData.map((data, index) => (
-            <SalesCard
+          <div className="grid grid-cols-6 gap-2 px-2 place-items-center">
+            <p className="text-sm">Operation</p>
+            <p className="text-sm">Network</p>
+            <p className="text-sm">Amounts</p>
+            <p className="text-sm">Wallet ID</p>
+            <p className="text-sm">TxHash</p>
+            <p className="text-sm">Date</p>
+          </div>
+          {transactions.slice(-5).map((tx: any, index: any) => (
+            <LastTransactions
               key={index}
-              email={data.email}
-              name={data.name}
-              salesAmount={data.salesAmount}
+              blockchain={tx.blockchain}
+              transactionType={tx.transactionType}
+              amounts={tx.amounts}
+              walletId={tx.walletId}
+              txHash={tx.txHash}
+              operation={tx.operation}
+              firstConfirmDate={tx.firstConfirmDate}
+              tokenId={tx.tokenId}
             />
           ))}
         </CardContent>

@@ -49,7 +49,6 @@ export const SignUpForm = () => {
 
   async function onSubmit(values: z.infer<typeof SignupFormSchema>) {
     setLoading(true);
-    console.log(values);
     try {
       const response = await create_user_account();
       if (!response) return;

@@ -1,8 +1,19 @@
-import { AuthOptions } from "next-auth";
+import { AuthOptions, DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 import prisma from "@/lib/prismadb";
+
+declare module "next-auth" {
+  interface Session extends DefaultSession {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      circleUserId: string;
+    };
+  }
+}
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -43,4 +54,32 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
   },
   debug: process.env.NODE_ENV !== "production",
+  callbacks: {
+    async session({ token, session }) {
+      if (session.user) {
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
+        session.user.id = token.sub as string;
+        session.user.circleUserId = token.circleUserId as string;
+      }
+      return session;
+    },
+    async jwt({ token }) {
+      if (!token) return token;
+      if (!token.sub) return token;
+
+      const user = await prisma.user.findFirst({
+        where: { id: token.sub },
+      });
+
+      if (!user) return token;
+
+      token.name = user.name;
+      token.email = user.email;
+      token.id = user.id;
+      token.circleUserId = user.circleUserId;
+
+      return token;
+    },
+  },
 };
