@@ -47,9 +47,13 @@ export default function LastTransactions({ ...props }: LastTransactionsProps) {
         <Image src={UsdcIcon} alt="token icon" width={20} height={20} />
       </div>
       <div className="text-xs">{truncateAddress(props.walletId)}</div>
-      <div className="text-xs">{truncateAddress(props.txHash)}</div>
       <div className="text-xs">
-        {getTimeAgo(props.firstConfirmDate.toLocaleString())}
+        {props.txHash ? truncateAddress(props.txHash) : "FAILED TX"}
+      </div>
+      <div className="text-xs">
+        {props.firstConfirmDate
+          ? getTimeAgo(props.firstConfirmDate?.toLocaleString())
+          : "FAILED TX"}
       </div>
     </div>
   );

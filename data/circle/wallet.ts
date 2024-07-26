@@ -36,14 +36,13 @@ export const getCircleWallet = async (userId: string, walletId: string) => {
     },
   };
 
-  axios
-    .request(options)
-    .then(function (response) {
-      return response.data;
-    })
-    .catch(function (error) {
-      console.error(error);
-    });
+  try {
+    const response = await axios.request(options);
+    return response.data.data.wallet;
+  } catch (error) {
+    console.error(error);
+    return undefined; // Hata durumunda undefined döndür
+  }
 };
 
 export const getCircleTokenBalances = async (

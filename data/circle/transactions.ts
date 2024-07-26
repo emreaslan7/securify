@@ -1,3 +1,7 @@
+"use server";
+
+import dotenv from "dotenv";
+dotenv.config();
 import { acquire_session_token } from "@/actions/createUser/steps/acquire_session_token";
 import axios from "axios";
 
@@ -5,11 +9,7 @@ export const getCircleTransactionsList = async (
   userId: string,
   isLastMonth: boolean
 ) => {
-  // Queries items created before the specified date-time (inclusive) in ISO 8601 format.
-
-  //sample url : https://api.circle.com/v1/w3s/transactions?from=2023-01-01T12%3A04%3A05Z&to=2023-01-01T12%3A04%3A05Z&pageSize=10
-
-  let url = "https://api.circle.com/v1/w3s/transactions?blockchain=MATIC-AMOY";
+  let url = "https://api.circle.com/v1/w3s/transactions?pageSize=10";
 
   if (isLastMonth) {
     const date = new Date();

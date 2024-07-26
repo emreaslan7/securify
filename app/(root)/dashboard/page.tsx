@@ -2,7 +2,7 @@ import BarChart from "@/components/bar-chart";
 import PageTitle from "@/components/page-title";
 import Card, { CardContent, CardProps } from "@/components/card";
 import {
-  Activity,
+  WalletIcon,
   CreditCard,
   DollarSign,
   ArrowLeftRightIcon,
@@ -16,6 +16,8 @@ import {
   updateCircleWallet,
 } from "@/data/circle/wallet";
 import { getCircleTransactionsList } from "@/data/circle/transactions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/AuthOptions";
 
 const cardData: CardProps[] = [
   {
@@ -30,22 +32,16 @@ const cardData: CardProps[] = [
     discription: "+180.1% from last month",
     icon: ArrowLeftRightIcon,
   },
-  // {
-  //   label: "Sales",
-  //   amount: "+12,234",
-  //   discription: "+19% from last month",
-  //   icon: CreditCard,
-  // },
-  // {
-  //   label: "Active Mow",
-  //   amount: "+573",
-  //   discription: "+201 from last month",
-  //   icon: Activity,
-  // },
+  {
+    label: "Wallet Count",
+    amount: "12",
+    discription: "+20.1% from last month",
+    icon: WalletIcon,
+  },
 ];
 
 export default async function DashboardPage() {
-  // getCircleWalletsList("de00db2b-b9e2-4049-934c-e0a90eee3020");
+  const session = await getServerSession(authOptions);
   // getCircleWallet(
   //   "de00db2b-b9e2-4049-934c-e0a90eee3020",
   //   "dcd042ea-f71b-54ea-9e9e-ae44f3b52d79"
@@ -59,22 +55,27 @@ export default async function DashboardPage() {
   //   "473b0e76-19a5-43c0-8bed-7d851a4ee9da",
   //   "b9870113-a70c-58ba-b39d-37797ca66cad"
   // );
+
+  const userWallets = await getCircleWalletsList(
+    session?.user.circleUserId as string
+  );
+  cardData[2].amount = `${userWallets.length.toString()}`;
+
   const totalBalance = await getCircleAllTokenBalances(
-    "473b0e76-19a5-43c0-8bed-7d851a4ee9da"
+    session?.user.circleUserId as string
   );
   cardData[0].amount = `${totalBalance.toString()} $`;
 
   const transactions = await getCircleTransactionsList(
-    "473b0e76-19a5-43c0-8bed-7d851a4ee9da",
+    session?.user.circleUserId as string,
     true
   );
-  console.log(transactions);
   cardData[1].amount = `+${transactions.length.toString()}`;
 
   return (
     <div className="flex flex-col gap-5 w-full px-4">
       <PageTitle title="Dashboard" />
-      <section className="grid w-full grid-cols-1 gap-4  transition-all sm:grid-cols-2 xl:grid-cols-2">
+      <section className="grid w-full grid-cols-1 gap-4  transition-all sm:grid-cols-2 xl:grid-cols-3">
         {cardData.map((data, index) => (
           <Card
             key={index}
@@ -95,7 +96,7 @@ export default async function DashboardPage() {
           <section>
             <p>Last 5 Transactions</p>
             <p className="text-sm text-gray-400">
-              {`You made ${transactions.length} transactions in the last month`}
+              {`You made ${transactions?.length} transactions in the last month`}
             </p>
           </section>
           <div className="grid grid-cols-6 gap-2 px-2 place-items-center">
@@ -106,7 +107,7 @@ export default async function DashboardPage() {
             <p className="text-sm">TxHash</p>
             <p className="text-sm">Date</p>
           </div>
-          {transactions.slice(-5).map((tx: any, index: any) => (
+          {transactions.slice(0, 5).map((tx: any, index: any) => (
             <LastTransactions
               key={index}
               blockchain={tx.blockchain}

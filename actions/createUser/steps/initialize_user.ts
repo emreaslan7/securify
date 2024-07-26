@@ -5,9 +5,6 @@ import axios from "axios";
 export const initialize_user = async (userToken: string) => {
   const idempotencyKey = uuidv4();
 
-  console.log("initliaze içindeki user token: ", userToken);
-  console.log("initliaze içindeki idempotency key: ", idempotencyKey);
-
   const options = {
     method: "POST",
     url: "https://api.circle.com/v1/w3s/user/initialize",
@@ -22,7 +19,6 @@ export const initialize_user = async (userToken: string) => {
   return axios
     .request(options)
     .then(function (response) {
-      console.log("idempotency key: ", idempotencyKey);
       return response.data.data.challengeId;
     })
     .catch(function (error) {

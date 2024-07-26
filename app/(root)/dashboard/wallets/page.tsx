@@ -1,156 +1,99 @@
-/**
- * eslint-disable @next/next/no-img-element
- *
- * @format
- */
-
-/** @format */
-"use client";
-
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import React from "react";
 import PageTitle from "@/components/page-title";
+import { getCircleWallet, getCircleWalletsList } from "@/data/circle/wallet";
+import truncateAddress from "@/helpers/truncateAddress";
+import { getTimeAgo } from "@/helpers/getTimeAgo";
+import { NewWalletDialog } from "@/components/new_wallet_dialog";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/AuthOptions";
 
 type Props = {};
 type Payment = {
+  id: string;
+  network: string;
+  accountType: string;
+  createDate: string;
+  state: string;
   name: string;
-  email: string;
-  lastOrder: string;
-  method: string;
+  refId: string;
+  address: string;
 };
 
 const columns: ColumnDef<Payment>[] = [
   {
+    accessorKey: "id",
+    header: "Wallet ID",
+  },
+  {
     accessorKey: "name",
     header: "Name",
-    cell: ({ row }) => {
-      return (
-        <div className="flex gap-2 items-center">
-          <img
-            className="h-10 w-10"
-            src={`https://api.dicebear.com/7.x/lorelei/svg?seed=${row.getValue(
-              "name"
-            )}`}
-            alt="user-image"
-          />
-          <p>{row.getValue("name")} </p>
-        </div>
-      );
-    },
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "refId",
+    header: "Ref Id",
   },
   {
-    accessorKey: "lastOrder",
-    header: "Last Order",
+    accessorKey: "network",
+    header: "Network",
+  },
+
+  {
+    accessorKey: "address",
+    header: "Address",
   },
   {
-    accessorKey: "method",
-    header: "Method",
+    accessorKey: "accountType",
+    header: "Account Type",
+  },
+
+  {
+    accessorKey: "state",
+    header: "State",
+  },
+
+  {
+    accessorKey: "createDate",
+    header: "Create Date",
   },
 ];
 
-const data: Payment[] = [
-  {
-    name: "John Doe",
-    email: "john@example.com",
-    lastOrder: "2023-01-01",
-    method: "Credit Card",
-  },
-  {
-    name: "Alice Smith",
-    email: "alice@example.com",
-    lastOrder: "2023-02-15",
-    method: "PayPal",
-  },
-  {
-    name: "Bob Johnson",
-    email: "bob@example.com",
-    lastOrder: "2023-03-20",
-    method: "Stripe",
-  },
-  {
-    name: "Emma Brown",
-    email: "emma@example.com",
-    lastOrder: "2023-04-10",
-    method: "Venmo",
-  },
-  {
-    name: "Michael Davis",
-    email: "michael@example.com",
-    lastOrder: "2023-05-05",
-    method: "Cash",
-  },
-  {
-    name: "Sophia Wilson",
-    email: "sophia@example.com",
-    lastOrder: "2023-06-18",
-    method: "Bank Transfer",
-  },
-  {
-    name: "Liam Garcia",
-    email: "liam@example.com",
-    lastOrder: "2023-07-22",
-    method: "Payoneer",
-  },
-  {
-    name: "Olivia Martinez",
-    email: "olivia@example.com",
-    lastOrder: "2023-08-30",
-    method: "Apple Pay",
-  },
-  {
-    name: "Noah Rodriguez",
-    email: "noah@example.com",
-    lastOrder: "2023-09-12",
-    method: "Google Pay",
-  },
-  {
-    name: "Ava Lopez",
-    email: "ava@example.com",
-    lastOrder: "2023-10-25",
-    method: "Cryptocurrency",
-  },
-  {
-    name: "Elijah Hernandez",
-    email: "elijah@example.com",
-    lastOrder: "2023-11-05",
-    method: "Alipay",
-  },
-  {
-    name: "Mia Gonzalez",
-    email: "mia@example.com",
-    lastOrder: "2023-12-08",
-    method: "WeChat Pay",
-  },
-  {
-    name: "James Perez",
-    email: "james@example.com",
-    lastOrder: "2024-01-18",
-    method: "Square Cash",
-  },
-  {
-    name: "Charlotte Carter",
-    email: "charlotte@example.com",
-    lastOrder: "2024-02-22",
-    method: "Zelle",
-  },
-  {
-    name: "Benjamin Taylor",
-    email: "benjamin@example.com",
-    lastOrder: "2024-03-30",
-    method: "Stripe",
-  },
-];
+export default async function WalletsPage({}: Props) {
+  const session = await getServerSession(authOptions);
+  console.log(session);
 
-export default function WalletsPage({}: Props) {
+  // const wallet = await getCircleWallet(
+  //   "473b0e76-19a5-43c0-8bed-7d851a4ee9da",
+  //   "b9870113-a70c-58ba-b39d-37797ca66cad"
+  // );
+  // const wallets = await getCircleWalletsList(
+  //   "de00db2b-b9e2-4049-934c-e0a90eee3020"
+  // );
+  const wallets = await getCircleWalletsList(
+    session?.user?.circleUserId as string
+  );
+
+  // console.log(wallets);
   return (
-    <div className="flex flex-col gap-5  w-full">
-      <PageTitle title="Users" />
-      <DataTable columns={columns} data={data} />
+    <div className="flex flex-col gap-5  w-full px-4">
+      <div className="flex items-center justify-between">
+        <PageTitle title="Wallets" />
+        <NewWalletDialog />
+      </div>
+      <DataTable
+        columns={columns}
+        data={wallets.map((wallet: any) => ({
+          id: truncateAddress(wallet.id),
+          network: wallet.blockchain,
+          accountType: wallet.accountType,
+          createDate: getTimeAgo(wallet.createDate),
+          state: wallet.state,
+          name: wallet.name,
+          refId: wallet.refId,
+          address: truncateAddress(wallet.address),
+        }))}
+      />
     </div>
   );
 }

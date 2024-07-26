@@ -79,7 +79,6 @@ export const SignUpForm = () => {
       toast.success("Account created successfully");
       router.push("/signin");
     } catch (error: any) {
-      console.log("Register error:", error);
       toast.error(error?.response?.data || "An error occurred");
     } finally {
       setLoading(false);

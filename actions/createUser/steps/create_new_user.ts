@@ -22,8 +22,6 @@ export const create_new_user = async () => {
   return axios
     .request(options)
     .then(function (response) {
-      console.log("user id: ", userId);
-      console.log("status:", response.request.status);
       return {
         userId: userId,
         status: response.request.status,

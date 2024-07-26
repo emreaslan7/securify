@@ -7,6 +7,7 @@ import {
   Settings,
   ArrowLeftRightIcon,
   WalletIcon,
+  Handshake,
 } from "lucide-react";
 import { Button } from "./button";
 
@@ -67,6 +68,12 @@ export default function Sidebar({}: Props) {
             title: "Transactions",
             href: "/dashboard/transactions",
             icon: ArrowLeftRightIcon,
+            variant: "ghost",
+          },
+          {
+            title: "Transfer",
+            href: "/dashboard/transfer",
+            icon: Handshake,
             variant: "ghost",
           },
           {
