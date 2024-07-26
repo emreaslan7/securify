@@ -15,10 +15,22 @@ import { initialize_transfer } from "@/actions/initiaze_transfer";
 import useExecuteChallenge from "@/hooks/useExecuteChallenge";
 import { getCircleTransactionsList } from "@/data/circle/transactions";
 import { AlertCircle, CircleCheck } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import usdcIcon from "@/public/blockchain/usdc.png";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { getCircleTokenBalances } from "@/data/circle/wallet";
 
-export default function Transfer(wallets: any) {
+interface TransferProps {
+  wallets: any;
+}
+
+export default function Transfer({ wallets }: TransferProps) {
   const { executeChallenge, error } = useExecuteChallenge();
 
   const [formError, setFormError] = useState("");
@@ -31,29 +43,11 @@ export default function Transfer(wallets: any) {
   const [amount, setAmount] = useState(0);
 
   const getTransferDetails = async () => {
-    console.log("fromAccount get transfer details içinde: ", fromAccount);
     const transactions = await getCircleTransactionsList(
       fromAccount.userId,
       false
     );
     return transactions[0];
-    // blockchain: "MATIC-AMOY";
-    // createDate: "2024-07-25T22:23:36Z";
-    // custodyType: "ENDUSER";
-    // destinationAddress: "0x09063b7ed7442da1179e7d8459d5547496302b6a";
-    // errorDetails: "execution reverted: ERC20: transfer amount exceeds balance";
-    // errorReason: "INSUFFICIENT_TOKEN";
-    // id: "75ebd761-01f9-554b-9745-1aedf726749f";
-    // networkFee: "";
-    // nfts: null;
-    // operation: "TRANSFER";
-    // sourceAddress: "0x07d3dcfc50186ee065c4abc5d3c24e544c6e1c49";
-    // state: "FAILED";
-    // tokenId: "36b6931a-873a-56a8-8a27-b706b17104ee";
-    // transactionType: "OUTBOUND";
-    // updateDate: "2024-07-25T22:23:36Z";
-    // userId: "dee87ed6-1be4-4a25-8be2-7e1af41a1703";
-    // walletId: "47be13b9-a669-533f-892a-c9f1ca44f4fb";
   };
 
   const handleSubmit = async () => {
@@ -77,12 +71,26 @@ export default function Transfer(wallets: any) {
       return;
     }
 
+    const fromAccountBalance = await getCircleTokenBalances(
+      fromAccount.userId,
+      fromAccount.id
+    );
+    if (fromAccountBalance < amount) {
+      setFormError("You don't have enough balance to transfer this amount.");
+      return;
+    }
+
+    if (fromAccount.blockchain !== toAccount.blockchain) {
+      setFormError("You can't transfer between different blockchains.");
+      return;
+    }
+
     const response = await initialize_transfer(
       fromAccount.userId,
       amount.toString(),
       destinationAddress,
       "0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582",
-      fromAccount.id,
+      fromAccount.walletId,
       fromAccount.blockchain
     );
 
@@ -120,14 +128,13 @@ export default function Transfer(wallets: any) {
         </p>
         <div className="w-[1000px] flex items-center justify-between gap-4 mb-4">
           <div>
-            {" "}
             <Tabs
               onValueChange={(value) => setFromAccount(value)}
               className="w-[300px]"
             >
               <TabsList className="flex flex-col w-full h-full gap-y-2 ">
-                <ScrollArea className="w-full max-h-[250px]">
-                  {wallets.wallets.map((wallet: any) => (
+                <ScrollArea className="w-full h-[250px]">
+                  {wallets.map((wallet: any) => (
                     <TabsTrigger
                       key={wallet.id}
                       className="w-full py-3 data-[state=active]:bg-orange-600"
@@ -156,6 +163,17 @@ export default function Transfer(wallets: any) {
                           <div>
                             <p className="text-xs">{wallet.accountType}</p>
                           </div>
+                        </div>
+                        <div className="flex items-end justify-center">
+                          <Image
+                            src={usdcIcon}
+                            alt="usdc"
+                            width={16}
+                            height={16}
+                          />
+                          <span className="text-xs ml-1">
+                            {wallet.balance ? wallet.balance : "0"}
+                          </span>
                         </div>
                       </div>
                     </TabsTrigger>
@@ -205,8 +223,8 @@ export default function Transfer(wallets: any) {
               className="w-[300px]"
             >
               <TabsList className="flex flex-col w-full h-full gap-y-2 ">
-                <ScrollArea className="w-full max-h-[250px]">
-                  {wallets.wallets.map((wallet: any) => (
+                <ScrollArea className="w-full h-[250px]">
+                  {wallets.map((wallet: any) => (
                     <TabsTrigger
                       key={wallet.id}
                       className="w-full py-3 data-[state=active]:bg-orange-600"
@@ -235,6 +253,17 @@ export default function Transfer(wallets: any) {
                           <div>
                             <p className="text-xs">{wallet.accountType}</p>
                           </div>
+                        </div>
+                        <div className="flex items-end justify-center">
+                          <Image
+                            src={usdcIcon}
+                            alt="usdc"
+                            width={16}
+                            height={16}
+                          />
+                          <span className="text-xs ml-1">
+                            {wallet.balance ? wallet.balance : "0"}
+                          </span>
                         </div>
                       </div>
                     </TabsTrigger>
@@ -284,9 +313,9 @@ export default function Transfer(wallets: any) {
         )}
 
         {txDetails && txDetails.state !== "FAILED" && (
-          <Alert variant="default">
-            <CircleCheck className="h-4 w-4" />
-            <AlertTitle>Success</AlertTitle>
+          <Alert variant="default" className="border-green-500 border-2">
+            <CircleCheck className="h-4 w-4" fill="#22c55e" />
+            <AlertTitle className="text-green-500">Success</AlertTitle>
             <AlertDescription>
               Your transaction was completed successfully.
               {txDetails.transactionHash}
@@ -297,6 +326,26 @@ export default function Transfer(wallets: any) {
         <Button className="my-5" onClick={handleSubmit}>
           Start USDC Transfer
         </Button>
+        <Accordion type="multiple">
+          <AccordionItem value="item-1">
+            <AccordionTrigger>
+              What happens if I transfer USDC using my SCA wallet?
+            </AccordionTrigger>
+            <AccordionContent>
+              You can transfer USDC without having a native token. Gas fee is
+              covered by us.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2">
+            <AccordionTrigger>
+              Why am I not able to transfer to a different blockchain?
+            </AccordionTrigger>
+            <AccordionContent>
+              We have not activated the Cross Chain Payment Protocol - CCTP yet.
+              Stay tuned!
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </div>
   );

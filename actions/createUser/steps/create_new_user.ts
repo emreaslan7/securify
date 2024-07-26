@@ -5,8 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
 export const create_new_user = async () => {
-  console.log(" Circle API Key: ", process.env.CIRCLE_API_KEY);
-
   const userId = uuidv4();
 
   const options = {

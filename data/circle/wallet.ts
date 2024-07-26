@@ -1,3 +1,4 @@
+"use server";
 import { acquire_session_token } from "@/actions/createUser/steps/acquire_session_token";
 import axios from "axios";
 
@@ -70,9 +71,6 @@ export const getCircleTokenBalances = async (
   }
 };
 
-// her bir wallet ve bakiyesini object olarak döndüren fonksiyon
-// örnek object [{walletId: "123", balance: 100}]
-
 export const getCircleAllWalletBalances = async (userId: string) => {
   const userWallets = await getCircleWalletsList(userId);
 
@@ -86,11 +84,44 @@ export const getCircleAllWalletBalances = async (userId: string) => {
     allWalletBalances.push({
       walletId: userWallets[i].id,
       name: userWallets[i].name || "No Name",
+      userId: userWallets[i].userId,
       accountType: userWallets[i].accountType,
       blockchain: userWallets[i].blockchain,
+      address: userWallets[i].address,
       balance: tokenBalances,
     });
   }
+
+  //   {
+  //   id: '2b566800-037a-5513-afc5-1a71b2cb6d52',
+  //   state: 'LIVE',
+  //   walletSetId: '8dbca91b-3529-5bd0-b776-0b9e519de07d',
+  //   custodyType: 'ENDUSER',
+  //   userId: 'dee87ed6-1be4-4a25-8be2-7e1af41a1703',
+  //   refId: 'ref003',
+  //   name: 'wallet003',
+  //   address: '0x306d463d636f64ca2f3200ca0dedf899de5a070c',
+  //   blockchain: 'ETH-SEPOLIA',
+  //   accountType: 'SCA',
+  //   updateDate: '2024-07-26T10:18:57Z',
+  //   createDate: '2024-07-26T10:18:57Z',
+  //   scaCore: 'circle_6900_singleowner_v1'
+  // },
+
+  //   {
+  //   id: '47be13b9-a669-533f-892a-c9f1ca44f4fb',
+  //   state: 'LIVE',
+  //   walletSetId: '8dbca91b-3529-5bd0-b776-0b9e519de07d',
+  //   custodyType: 'ENDUSER',
+  //   userId: 'dee87ed6-1be4-4a25-8be2-7e1af41a1703',
+  //   refId: 'wallet123',
+  //   name: 'my wallet',
+  //   address: '0x07d3dcfc50186ee065c4abc5d3c24e544c6e1c49',
+  //   blockchain: 'MATIC-AMOY',
+  //   accountType: 'EOA',
+  //   updateDate: '2024-07-25T11:36:25Z',
+  //   createDate: '2024-07-25T11:36:25Z'
+  // },
 
   return allWalletBalances;
 };
