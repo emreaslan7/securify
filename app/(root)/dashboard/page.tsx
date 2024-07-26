@@ -10,6 +10,7 @@ import {
 import LastTransactions from "@/components/last-transactions";
 import {
   getCircleAllTokenBalances,
+  getCircleAllWalletBalances,
   getCircleTokenBalances,
   getCircleWallet,
   getCircleWalletsList,
@@ -72,6 +73,9 @@ export default async function DashboardPage() {
   );
   cardData[1].amount = `+${transactions.length.toString()}`;
 
+  const TokenBalancesUsdcForChart = await getCircleAllWalletBalances(
+    session?.user.circleUserId as string
+  );
   return (
     <div className="flex flex-col gap-5 w-full px-4">
       <PageTitle title="Dashboard" />
@@ -90,7 +94,7 @@ export default async function DashboardPage() {
       <section className="grid grid-cols-1 gap-4 transition-all lg:grid-cols-2">
         <CardContent>
           <p className="p-4 font-semibold">Overview</p>
-          <BarChart />
+          <BarChart wallets={TokenBalancesUsdcForChart} />
         </CardContent>
         <CardContent className="flex justify-between gap-4">
           <section>

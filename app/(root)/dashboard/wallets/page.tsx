@@ -61,7 +61,6 @@ const columns: ColumnDef<Payment>[] = [
 
 export default async function WalletsPage({}: Props) {
   const session = await getServerSession(authOptions);
-  console.log(session);
 
   // const wallet = await getCircleWallet(
   //   "473b0e76-19a5-43c0-8bed-7d851a4ee9da",
@@ -74,7 +73,6 @@ export default async function WalletsPage({}: Props) {
     session?.user?.circleUserId as string
   );
 
-  // console.log(wallets);
   return (
     <div className="flex flex-col gap-5  w-full px-4">
       <div className="flex items-center justify-between">

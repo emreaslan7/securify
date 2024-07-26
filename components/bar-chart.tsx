@@ -1,65 +1,56 @@
 "use client";
 import React from "react";
 import { Bar, ResponsiveContainer } from "recharts";
-import { BarChart as BarGraph, XAxis, YAxis } from "recharts";
+import { BarChart as BarGraph, XAxis, YAxis, Tooltip, Legend } from "recharts";
 
-type Props = {};
+type Wallet = {
+  walletId: string;
+  name: string;
+  accountType: string;
+  blockchain: string;
+  balance: string;
+};
 
-const data = [
-  {
-    name: "Jan",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Feb",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Mar",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Apr",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "May",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Jun",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Jul",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Aug",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Sep",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Oct",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Nov",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Dec",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-];
+// write type for customtooltip
 
-export default function BarChart({}: Props) {
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: any;
+  label?: any;
+};
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    const walletName = label;
+    const balance = payload[0].value;
+    const blockchain = payload[0].payload.blockchain;
+    const accountType = payload[0].payload.accountType;
+    const walletId = payload[0].payload.walletId;
+
+    return (
+      <div className="p-4 border-2 border-orange-600 rounded-lg bg-black text-white">
+        <p className="text-center">{walletName}</p>
+        <div className="text-xs flex items-center justify-between">
+          <p>Balance: </p> <p>${balance}</p>
+        </div>
+        <div className="text-xs flex items-center justify-between">
+          <p>Blockchain: </p> <p>{blockchain}</p>
+        </div>
+        <div className="text-xs flex items-center justify-between">
+          <p>Account Type: </p> <p>{accountType}</p>
+        </div>
+        <p className="text-xs">{`Wallet ID: ${walletId}`}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default function BarChart({ wallets }: { wallets: Wallet[] }) {
   return (
     <ResponsiveContainer width={"100%"} height={350}>
-      <BarGraph data={data} className="fill-orange-600">
+      <BarGraph data={wallets} className="fill-orange-600">
         <XAxis
           dataKey={"name"}
           tickLine={false}
@@ -68,13 +59,14 @@ export default function BarChart({}: Props) {
           fontSize={12}
         />
         <YAxis
-          tickLine={false}
+          tickLine={true}
           axisLine={false}
           stroke="#888888"
           fontSize={12}
           tickFormatter={(value) => `$${value}`}
         />
-        <Bar dataKey={"total"} radius={[4, 4, 0, 0]} />
+        <Tooltip content={CustomTooltip} />
+        <Bar dataKey={"balance"} radius={[4, 4, 0, 0]} />
       </BarGraph>
     </ResponsiveContainer>
   );

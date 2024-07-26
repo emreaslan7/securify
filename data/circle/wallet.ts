@@ -70,6 +70,31 @@ export const getCircleTokenBalances = async (
   }
 };
 
+// her bir wallet ve bakiyesini object olarak döndüren fonksiyon
+// örnek object [{walletId: "123", balance: 100}]
+
+export const getCircleAllWalletBalances = async (userId: string) => {
+  const userWallets = await getCircleWalletsList(userId);
+
+  let allWalletBalances = [];
+
+  for (let i = 0; i < userWallets.length; i++) {
+    const tokenBalances = await getCircleTokenBalances(
+      userId,
+      userWallets[i].id
+    );
+    allWalletBalances.push({
+      walletId: userWallets[i].id,
+      name: userWallets[i].name || "No Name",
+      accountType: userWallets[i].accountType,
+      blockchain: userWallets[i].blockchain,
+      balance: tokenBalances,
+    });
+  }
+
+  return allWalletBalances;
+};
+
 export const getCircleAllTokenBalances = async (userId: string) => {
   const userWallets = await getCircleWalletsList(userId);
 
