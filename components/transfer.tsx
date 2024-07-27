@@ -11,7 +11,7 @@ import truncateAddress from "@/helpers/truncateAddress";
 import Polygon from "@/public/blockchain/polygon.png";
 import Ethereum from "@/public/blockchain/ethereum.png";
 import Avalance from "@/public/blockchain/avalanche.png";
-import { initialize_transfer } from "@/actions/initiaze_transfer";
+import { initialize_transfer } from "@/actions/user-controlled-wallets/initiaze_transfer";
 import useExecuteChallenge from "@/hooks/useExecuteChallenge";
 import { getCircleTransactionsList } from "@/data/circle/transactions";
 import { AlertCircle, CircleCheck } from "lucide-react";

@@ -1,6 +1,6 @@
-import { acquire_session_token } from "@/actions/createUser/steps/acquire_session_token";
-import { create_new_user } from "@/actions/createUser/steps/create_new_user";
-import { initialize_user } from "@/actions/createUser/steps/initialize_user";
+import { acquire_session_token } from "@/actions/user-controlled-wallets/createUser/steps/acquire_session_token";
+import { create_new_user } from "@/actions/user-controlled-wallets/createUser/steps/create_new_user";
+import { initialize_user } from "@/actions/user-controlled-wallets/createUser/steps/initialize_user";
 
 export const create_user_account = async () => {
   const creatingUserId = await create_new_user();

@@ -1,6 +1,6 @@
 "use server";
-import { acquire_session_token } from "@/actions/createUser/steps/acquire_session_token";
-import { create_wallet_challenge } from "@/actions/createWallet/steps/create_wallet_challenge";
+import { acquire_session_token } from "@/actions/user-controlled-wallets/createUser/steps/acquire_session_token";
+import { create_wallet_challenge } from "@/actions/user-controlled-wallets/createWallet/steps/create_wallet_challenge";
 
 export const create_wallet = async (
   userId: string,

@@ -25,7 +25,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useExecuteChallenge from "@/hooks/useExecuteChallenge";
-import { create_wallet } from "@/actions/createWallet";
+import { create_wallet } from "@/actions/user-controlled-wallets/createWallet";
 import { useSession } from "next-auth/react";
 
 export function NewWalletDialog() {

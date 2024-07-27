@@ -9,6 +9,9 @@ export const LoginFormSchema = z.object({
   }),
 });
 
+// signup form şemasının içine custodyType adında bir parametre daha oluşturacağız.
+// custodyType string ve enum olacak ve değerleri END_USER ve DEVELOPER olacak.
+
 export const SignupFormSchema = z.object({
   name: z.string().min(2, {
     message: "Username must be at least 2 characters.",
@@ -19,4 +22,5 @@ export const SignupFormSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters.",
   }),
+  custodyType: z.enum(["END_USER", "DEVELOPER"]),
 });

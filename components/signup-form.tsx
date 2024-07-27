@@ -18,13 +18,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { SignupFormSchema } from "@/schemas/index";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { create_user_account } from "@/actions/createUser";
+import { create_user_account } from "@/actions/user-controlled-wallets/createUser";
 import useExecuteChallenge from "@/hooks/useExecuteChallenge";
+
+import { Label } from "./ui/label";
+import {
+  create_wallet_set,
+  create_wallet,
+} from "@/actions/developer-contolled-wallets";
 
 export const SignUpForm = () => {
   const { executeChallenge, error, result } = useExecuteChallenge();
@@ -40,6 +47,7 @@ export const SignUpForm = () => {
       name: "",
       email: "",
       password: "",
+      custodyType: "END_USER",
     },
   });
 
@@ -48,46 +56,67 @@ export const SignUpForm = () => {
   }
 
   async function onSubmit(values: z.infer<typeof SignupFormSchema>) {
-    setLoading(true);
-    try {
-      const response = await create_user_account();
-      if (!response) return;
-      if (
-        !response.userToken ||
-        !response.encryptionKey ||
-        !response.challengeId
-      ) {
-        console.error("Missing userToken, encryptionKey or challengeId");
-        return;
+    // setLoading(true);
+
+    console.log("values:", values);
+    if (values.custodyType === "DEVELOPER") {
+      try {
+        const walletSet = await create_wallet_set(values.name);
+        console.log("walletSet:", walletSet);
+
+        const wallet = await create_wallet(walletSet?.id || "", values.name);
+
+        await axios.post("/api/register", {
+          name: values.name,
+          circleUserId: walletSet?.id,
+          custodyType: values.custodyType,
+          email: values.email,
+          password: values.password,
+        });
+        toast.success("Account created successfully");
+        router.push("/signin");
+      } catch (error) {
+        toast.error("An error occurred");
+      } finally {
+        setLoading(false);
       }
-
-      const result = executeChallenge(
-        response.userToken,
-        response.encryptionKey,
-        response.challengeId
-      );
-
-      if (!result) return;
-
-      await axios.post("/api/register", {
-        name: values.name,
-        circleUserId: response.userId,
-        email: values.email,
-        password: values.password,
-      });
-
-      toast.success("Account created successfully");
-      router.push("/signin");
-    } catch (error: any) {
-      toast.error(error?.response?.data || "An error occurred");
-    } finally {
-      setLoading(false);
+    } else {
+      try {
+        const response = await create_user_account();
+        if (!response) return;
+        if (
+          !response.userToken ||
+          !response.encryptionKey ||
+          !response.challengeId
+        ) {
+          console.error("Missing userToken, encryptionKey or challengeId");
+          return;
+        }
+        const result = executeChallenge(
+          response.userToken,
+          response.encryptionKey,
+          response.challengeId
+        );
+        if (!result) return;
+        await axios.post("/api/register", {
+          name: values.name,
+          circleUserId: response.userId,
+          email: values.email,
+          password: values.password,
+        });
+        toast.success("Account created successfully");
+        router.push("/signin");
+      } catch (error: any) {
+        toast.error(error?.response?.data || "An error occurred");
+      } finally {
+        setLoading(false);
+      }
     }
   }
 
   return (
     <div className="w-1/2 bg-white p-12 flex flex-col justify-center ">
-      <div className="w-[400px] mx-auto">
+      <div className="w-[400px] mx-auto text-black">
         <h2 className="text-3xl font-bold text-gray-500">Create an Account</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -145,7 +174,41 @@ export const SignUpForm = () => {
                 </FormItem>
               )}
             />
-            <div className="flex items-center justify-center flex-col">
+            <FormField
+              control={form.control}
+              name="custodyType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Custody Type</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="END_USER" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          User Controlled Account
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="DEVELOPER" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Developer Contolled Account
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center justify-center flex-col mt-3">
               <Button variant={"link"} className="p-0">
                 <Link
                   href="/signin"
@@ -157,11 +220,7 @@ export const SignUpForm = () => {
                   </p>
                 </Link>
               </Button>
-              <Button
-                type="submit"
-                className="w-full mt-2 mb-4"
-                disabled={loading}
-              >
+              <Button type="submit" className="w-full mb-4" disabled={loading}>
                 Create an Account
               </Button>
             </div>

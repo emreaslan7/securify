@@ -11,6 +11,7 @@ declare module "next-auth" {
       name: string;
       email: string;
       circleUserId: string;
+      custodyType: "END_USER" | "DEVELOPER";
     };
   }
 }
@@ -61,6 +62,9 @@ export const authOptions: AuthOptions = {
         session.user.email = token.email as string;
         session.user.id = token.sub as string;
         session.user.circleUserId = token.circleUserId as string;
+        session.user.custodyType = token.custodyType as
+          | "END_USER"
+          | "DEVELOPER";
       }
       return session;
     },
@@ -78,6 +82,7 @@ export const authOptions: AuthOptions = {
       token.email = user.email;
       token.id = user.id;
       token.circleUserId = user.circleUserId;
+      token.custodyType = user.custodyType;
 
       return token;
     },

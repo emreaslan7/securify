@@ -43,6 +43,8 @@ const cardData: CardProps[] = [
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
+
+  console.log("session:", session?.user);
   // getCircleWallet(
   //   "de00db2b-b9e2-4049-934c-e0a90eee3020",
   //   "dcd042ea-f71b-54ea-9e9e-ae44f3b52d79"

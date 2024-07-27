@@ -2,7 +2,7 @@
 
 import dotenv from "dotenv";
 dotenv.config();
-import { acquire_session_token } from "@/actions/createUser/steps/acquire_session_token";
+import { acquire_session_token } from "@/actions/user-controlled-wallets/createUser/steps/acquire_session_token";
 import axios from "axios";
 
 export const getCircleTransactionsList = async (
