@@ -58,20 +58,27 @@ export const create_wallet_set = async (name: string) => {
 };
 
 // Create Wallet Set
-export const create_wallet = async (walletSetId: string, name: string) => {
+export const createWalletDEV = async (
+  walletSetId: string,
+  name: string,
+  refId: string,
+  blockchain: string,
+  accountType: string
+) => {
   const response = await circleDeveloperSdk.createWallets({
-    accountType: "SCA",
-    blockchains: ["MATIC-AMOY" as any],
+    accountType: accountType as any,
+    blockchains: [blockchain as any],
     count: 1,
     walletSetId: `${walletSetId}`,
     metadata: [
       {
         name: name,
+        refId: refId,
       },
     ],
   });
 
-  console.log(response.data?.wallets);
+  console.log("olusturulan wallet :", response.data?.wallets);
 };
 
 // Get Wallets

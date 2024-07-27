@@ -11,6 +11,7 @@ import { getTimeAgo } from "@/helpers/getTimeAgo";
 import { NewWalletDialog } from "@/components/new_wallet_dialog";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/AuthOptions";
+import { getCircleWalletsDEV } from "@/data/circle/developer-controlled/wallet";
 
 type Props = {};
 type Payment = {
@@ -65,16 +66,13 @@ const columns: ColumnDef<Payment>[] = [
 export default async function WalletsPage({}: Props) {
   const session = await getServerSession(authOptions);
 
-  // const wallet = await getCircleWallet(
-  //   "473b0e76-19a5-43c0-8bed-7d851a4ee9da",
-  //   "b9870113-a70c-58ba-b39d-37797ca66cad"
-  // );
-  // const wallets = await getCircleWalletsList(
-  //   "de00db2b-b9e2-4049-934c-e0a90eee3020"
-  // );
-  const wallets = await getCircleWalletsList(
-    session?.user?.circleUserId as string
-  );
+  let wallets: any;
+
+  if (session?.user?.custodyType === "END_USER") {
+    wallets = await getCircleWalletsList(session?.user?.circleUserId as string);
+  } else {
+    wallets = await getCircleWalletsDEV(session?.user?.circleUserId as string);
+  }
 
   return (
     <div className="flex flex-col gap-5  w-full px-4">

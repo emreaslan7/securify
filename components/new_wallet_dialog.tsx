@@ -27,6 +27,7 @@ import { Label } from "@/components/ui/label";
 import useExecuteChallenge from "@/hooks/useExecuteChallenge";
 import { create_wallet } from "@/actions/user-controlled-wallets/createWallet";
 import { useSession } from "next-auth/react";
+import { createWalletDEV } from "@/actions/developer-contolled-wallets";
 
 export function NewWalletDialog() {
   const session = useSession();
@@ -49,23 +50,33 @@ export function NewWalletDialog() {
       return setFormError("SCA is not supported for AVAX-FUJI");
     }
 
-    const response = await create_wallet(
-      session.data?.user.circleUserId as string,
-      name,
-      refId,
-      blockchain,
-      accountType
-    );
-    if (!response) return;
+    if (session.data?.user.custodyType === "END_USER") {
+      const response = await create_wallet(
+        session.data?.user.circleUserId as string,
+        name,
+        refId,
+        blockchain,
+        accountType
+      );
+      if (!response) return;
 
-    const responseExecute = executeChallenge(
-      response.userToken,
-      response.encryptionKey,
-      response.challengeId
-    );
+      executeChallenge(
+        response.userToken,
+        response.encryptionKey,
+        response.challengeId
+      );
 
-    if (!result) return;
-    setFormError("");
+      if (!result) return;
+      setFormError("");
+    } else {
+      createWalletDEV(
+        session.data?.user.circleUserId as string,
+        name,
+        refId,
+        blockchain,
+        accountType
+      );
+    }
 
     window.location.reload();
   };
