@@ -50,7 +50,6 @@ const cardData: CardProps[] = [
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
-  console.log("session:", session?.user);
   let userWallets: any;
   let totalBalance: any;
   let transactions: any;
@@ -99,7 +98,6 @@ export default async function DashboardPage() {
     TokenBalancesUsdcForChart = await getCircleWalletsBalancesDEV(
       session?.user.circleUserId as string
     );
-    console.log("TokenBalancesUsdcForChart:", TokenBalancesUsdcForChart);
   }
 
   return (

@@ -39,18 +39,15 @@ const generate_ciphertext = async (secret: string) => {
       md: forge.md.sha256.create(),
     },
   });
-  console.log("encryptedData:", forge.util.encode64(encryptedData));
   return forge.util.encode64(encryptedData);
 };
 
 // Create Wallet Set
 export const create_wallet_set = async (name: string) => {
-  console.log("name:", name);
   try {
     const response = await circleDeveloperSdk.createWalletSet({
       name: name,
     });
-    console.log("response:", response.data?.walletSet);
     return response.data?.walletSet;
   } catch (error) {
     console.log("error:", error);
@@ -58,6 +55,20 @@ export const create_wallet_set = async (name: string) => {
 };
 
 // Create Wallet Set
+export const create_wallet = async (walletSetId: string, name: string) => {
+  const response = await circleDeveloperSdk.createWallets({
+    accountType: "SCA",
+    blockchains: ["MATIC-AMOY" as any],
+    count: 1,
+    walletSetId: `${walletSetId}`,
+    metadata: [
+      {
+        name: name,
+      },
+    ],
+  });
+};
+
 export const createWalletDEV = async (
   walletSetId: string,
   name: string,
@@ -77,15 +88,12 @@ export const createWalletDEV = async (
       },
     ],
   });
-
-  console.log("olusturulan wallet :", response.data?.wallets);
 };
 
 // Get Wallets
 const get_wallets = async () => {
   try {
     const response = await circleDeveloperSdk.listWallets({});
-    console.log(response.data?.wallets);
   } catch (error) {
     console.log("error:", error);
   }
@@ -97,7 +105,6 @@ const get_wallet = async () => {
     const response = await circleDeveloperSdk.getWallet({
       id: `${process.env.WALLET_ID_1}`,
     });
-    console.log(response.data);
   } catch (error) {
     console.log("error:", error);
   }
@@ -128,30 +135,37 @@ const get_balance = async () => {
 };
 
 // Transfer Token
-// const transfer_token = async () => {
-//   const response = await circleDeveloperSdk.createTransaction({
-//     walletId: `${process.env.WALLET_ID_1}`,
-//     tokenId: `${process.env.USDC_TOKEN_ID}`,
-//     destinationAddress: `${process.env.WALLET_ADDRESS_2}`,
-//     amounts: [".01" as any],
-//     fee: {
-//       type: "level",
-//       config: {
-//         feeLevel: "MEDIUM",
-//       },
-//     },
-//   });
-
-//   console.log("response: ", response.data);
-// };
+export const transferTokenDEV = async (
+  walletId: string,
+  destinationAddress: string,
+  amount: string
+) => {
+  try {
+    const response = await circleDeveloperSdk.createTransaction({
+      walletId: `${walletId}`,
+      tokenId: `36b6931a-873a-56a8-8a27-b706b17104ee`,
+      destinationAddress: `${destinationAddress}`,
+      amounts: [amount],
+      fee: {
+        type: "level",
+        config: {
+          feeLevel: "HIGH",
+        },
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.log("error:", error?.response?.data);
+  }
+};
 
 // Check transafer state
-const check_transfer_state = async (id: string) => {
+export const checkTransferStateDEV = async (id: string) => {
   const response = await circleDeveloperSdk.getTransaction({
     id: id,
   });
 
-  console.log("response: ", response.data);
+  return response.data;
 };
 
 // // Exports

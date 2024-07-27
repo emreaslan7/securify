@@ -52,8 +52,7 @@ export const getCircleAllTokenBalancesDEV = async (walletSetId: string) => {
       const balance = await getCircleTokenBalanceDEV(
         response.data?.wallets[i].id
       );
-      if (!balance) return;
-      totalBalance += Number(balance);
+      if (balance) totalBalance += Number(balance);
     }
     return totalBalance;
   } catch (error) {
@@ -73,7 +72,6 @@ export const getCircleWalletsBalancesDEV = async (walletSetId: string) => {
       const balance = await getCircleTokenBalanceDEV(
         response.data?.wallets[i].id
       );
-      if (!balance) return;
       balances.push({
         walletId: response.data?.wallets[i].id,
         name: response.data?.wallets[i].name || "No Name",

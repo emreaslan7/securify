@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,12 +26,18 @@ import usdcIcon from "@/public/blockchain/usdc.png";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getCircleTokenBalances } from "@/data/circle/user-controlled/wallet";
+import { useSession } from "next-auth/react";
+import {
+  checkTransferStateDEV,
+  transferTokenDEV,
+} from "@/actions/developer-contolled-wallets";
 
 interface TransferProps {
   wallets: any;
 }
 
 export default function Transfer({ wallets }: TransferProps) {
+  const session = useSession();
   const { executeChallenge, error } = useExecuteChallenge();
 
   const [formError, setFormError] = useState("");
@@ -70,52 +77,61 @@ export default function Transfer({ wallets }: TransferProps) {
       setFormError("You can't transfer to the same address.");
       return;
     }
-
-    const fromAccountBalance = await getCircleTokenBalances(
-      fromAccount.userId,
-      fromAccount.id
-    );
-    if (fromAccountBalance < amount) {
-      setFormError("You don't have enough balance to transfer this amount.");
-      return;
-    }
-
     if (fromAccount.blockchain !== toAccount.blockchain) {
       setFormError("You can't transfer between different blockchains.");
       return;
     }
-
-    const response = await initialize_transfer(
-      fromAccount.userId,
-      amount.toString(),
-      destinationAddress,
-      "0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582",
-      fromAccount.walletId,
-      fromAccount.blockchain
-    );
-
-    if (!response) {
-      setFormError("Failed to initialize transfer");
+    if (fromAccount.balance < amount) {
+      setFormError("You don't have enough balance to transfer this amount.");
       return;
     }
 
-    const { userToken, encryptionKey, challengeId, userId } = response;
+    if (session?.data?.user?.custodyType === "END_USER") {
+      const response = await initialize_transfer(
+        fromAccount.userId,
+        amount.toString(),
+        destinationAddress,
+        "0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582",
+        fromAccount.walletId,
+        fromAccount.blockchain
+      );
 
-    const challengeResponse = await executeChallenge(
-      userToken,
-      encryptionKey,
-      challengeId
-    );
+      if (!response) {
+        setFormError("Failed to initialize transfer");
+        return;
+      }
 
-    if (!challengeResponse) {
-      setFormError("Failed to execute transfer");
-      return;
+      const { userToken, encryptionKey, challengeId, userId } = response;
+
+      const challengeResponse = await executeChallenge(
+        userToken,
+        encryptionKey,
+        challengeId
+      );
+
+      if (!challengeResponse) {
+        setFormError("Failed to execute transfer");
+        return;
+      }
+
+      const lastTx = await getTransferDetails();
+      setTxDetails(lastTx);
+
+      setFormError("");
+    } else {
+      const response: any = await transferTokenDEV(
+        fromAccount.walletId,
+        destinationAddress,
+        amount.toString()
+      );
+      // response:  { id: '4e93c300-521d-57f8-ba7d-ba718b48e84e', state: 'INITIATED' }
+      const txDetails = await checkTransferStateDEV(response.id);
+      setTxDetails(txDetails);
+      if (!response) {
+        setFormError("Failed to initialize transfer");
+        return;
+      }
     }
-
-    const lastTx = await getTransferDetails();
-    setTxDetails(lastTx);
-
-    setFormError("");
     return;
   };
 
@@ -136,7 +152,7 @@ export default function Transfer({ wallets }: TransferProps) {
                 <ScrollArea className="w-full h-[250px]">
                   {wallets.map((wallet: any) => (
                     <TabsTrigger
-                      key={wallet.id}
+                      key={wallet.address}
                       className="w-full py-3 data-[state=active]:bg-orange-600"
                       value={wallet}
                     >
@@ -226,7 +242,7 @@ export default function Transfer({ wallets }: TransferProps) {
                 <ScrollArea className="w-full h-[250px]">
                   {wallets.map((wallet: any) => (
                     <TabsTrigger
-                      key={wallet.id}
+                      key={wallet.address}
                       className="w-full py-3 data-[state=active]:bg-orange-600"
                       value={wallet}
                     >

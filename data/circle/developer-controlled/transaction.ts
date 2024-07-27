@@ -12,10 +12,5 @@ export const getCircleWalletTransactionsDEV = async (walletIds: any) => {
     walletIds: walletIds,
   });
 
-  console.log("response: ", response.data?.transactions);
   return response.data?.transactions;
-  //   console.log(
-  //     "amount: ",
-  //     response.data?.transactions && response.data.transactions[0]?.amounts
-  //   );
 };
