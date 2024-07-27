@@ -2,7 +2,10 @@ import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import React from "react";
 import PageTitle from "@/components/page-title";
-import { getCircleWallet, getCircleWalletsList } from "@/data/circle/wallet";
+import {
+  getCircleWallet,
+  getCircleWalletsList,
+} from "@/data/circle/user-controlled/wallet";
 import truncateAddress from "@/helpers/truncateAddress";
 import { getTimeAgo } from "@/helpers/getTimeAgo";
 import { NewWalletDialog } from "@/components/new_wallet_dialog";

@@ -15,8 +15,14 @@ import {
   getCircleWallet,
   getCircleWalletsList,
   updateCircleWallet,
-} from "@/data/circle/wallet";
-import { getCircleTransactionsList } from "@/data/circle/transactions";
+} from "@/data/circle/user-controlled/wallet";
+import {
+  getCircleWalletsDEV,
+  getCircleAllTokenBalancesDEV,
+  getCircleWalletsBalancesDEV,
+} from "@/data/circle/developer-controlled/wallet";
+import { getCircleWalletTransactionsDEV } from "@/data/circle/developer-controlled/transaction";
+import { getCircleTransactionsList } from "@/data/circle/user-controlled/transactions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/AuthOptions";
 
@@ -45,39 +51,57 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   console.log("session:", session?.user);
-  // getCircleWallet(
-  //   "de00db2b-b9e2-4049-934c-e0a90eee3020",
-  //   "dcd042ea-f71b-54ea-9e9e-ae44f3b52d79"
-  // );
-  // updateCircleWallet(
-  //   "de00db2b-b9e2-4049-934c-e0a90eee3020",
-  //   "dcd042ea-f71b-54ea-9e9e-ae44f3b52d79",
-  //   { name: "test", refId: "test" }
-  // );
-  // getCircleTokenBalances(
-  //   "473b0e76-19a5-43c0-8bed-7d851a4ee9da",
-  //   "b9870113-a70c-58ba-b39d-37797ca66cad"
-  // );
+  let userWallets: any;
+  let totalBalance: any;
+  let transactions: any;
+  let TokenBalancesUsdcForChart: any;
 
-  const userWallets = await getCircleWalletsList(
-    session?.user.circleUserId as string
-  );
-  cardData[2].amount = `${userWallets.length.toString()}`;
+  if (session?.user.custodyType === "END_USER") {
+    userWallets = await getCircleWalletsList(
+      session?.user.circleUserId as string
+    );
+    cardData[2].amount = `${userWallets.length.toString()}`;
 
-  const totalBalance = await getCircleAllTokenBalances(
-    session?.user.circleUserId as string
-  );
-  cardData[0].amount = `${totalBalance.toString()} $`;
+    totalBalance = await getCircleAllTokenBalances(
+      session?.user.circleUserId as string
+    );
+    cardData[0].amount = `${totalBalance.toString()} $`;
 
-  const transactions = await getCircleTransactionsList(
-    session?.user.circleUserId as string,
-    true
-  );
-  cardData[1].amount = `+${transactions.length.toString()}`;
+    transactions = await getCircleTransactionsList(
+      session?.user.circleUserId as string,
+      true
+    );
+    cardData[1].amount = `+${transactions.length.toString()}`;
 
-  const TokenBalancesUsdcForChart = await getCircleAllWalletBalances(
-    session?.user.circleUserId as string
-  );
+    TokenBalancesUsdcForChart = await getCircleAllWalletBalances(
+      session?.user.circleUserId as string
+    );
+  } else {
+    // fetch developer controlled wallets
+    userWallets = await getCircleWalletsDEV(
+      session?.user.circleUserId as string
+    );
+    cardData[2].amount = `${userWallets.length.toString()}`;
+
+    // fetch total balance of all wallets
+    totalBalance = await getCircleAllTokenBalancesDEV(
+      session?.user.circleUserId as string
+    );
+    cardData[0].amount = `${totalBalance.toString()} $`;
+
+    // aşağıdaki fonksiyonun içine userWALLETS[i].id yazılmalı ARRAY ŞEKLİNDE İD'lER GİTMELİ WALLET ıD'leri
+    // ['id1', 'id2', 'id3'] gibi
+    transactions = await getCircleWalletTransactionsDEV(
+      userWallets.map((wallet: any) => wallet.id)
+    );
+    cardData[1].amount = `+${transactions.length.toString()}`;
+
+    TokenBalancesUsdcForChart = await getCircleWalletsBalancesDEV(
+      session?.user.circleUserId as string
+    );
+    console.log("TokenBalancesUsdcForChart:", TokenBalancesUsdcForChart);
+  }
+
   return (
     <div className="flex flex-col gap-5 w-full px-4">
       <PageTitle title="Dashboard" />

@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, password, circleUserId } = body;
+    const { name, email, password, circleUserId, custodyType } = body;
 
     if (!email || !password || !name || !circleUserId) {
       return new NextResponse("Missing credentials", { status: 400 });
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
       data: {
         name,
         circleUserId,
+        custodyType,
         email,
         password: hashedPassword,
       },

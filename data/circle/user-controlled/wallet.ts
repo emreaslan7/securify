@@ -76,7 +76,7 @@ export const getCircleAllWalletBalances = async (userId: string) => {
 
   let allWalletBalances = [];
 
-  for (let i = 0; i < userWallets.length; i++) {
+  for (let i = 0; i < userWallets?.length; i++) {
     const tokenBalances = await getCircleTokenBalances(
       userId,
       userWallets[i].id

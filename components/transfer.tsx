@@ -13,7 +13,7 @@ import Ethereum from "@/public/blockchain/ethereum.png";
 import Avalance from "@/public/blockchain/avalanche.png";
 import { initialize_transfer } from "@/actions/user-controlled-wallets/initiaze_transfer";
 import useExecuteChallenge from "@/hooks/useExecuteChallenge";
-import { getCircleTransactionsList } from "@/data/circle/transactions";
+import { getCircleTransactionsList } from "@/data/circle/user-controlled/transactions";
 import { AlertCircle, CircleCheck } from "lucide-react";
 import {
   Accordion,
@@ -24,7 +24,7 @@ import {
 import usdcIcon from "@/public/blockchain/usdc.png";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { getCircleTokenBalances } from "@/data/circle/wallet";
+import { getCircleTokenBalances } from "@/data/circle/user-controlled/wallet";
 
 interface TransferProps {
   wallets: any;

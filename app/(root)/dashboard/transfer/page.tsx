@@ -3,7 +3,7 @@ import React from "react";
 import Transfer from "@/components/transfer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/AuthOptions";
-import { getCircleAllWalletBalances } from "@/data/circle/wallet";
+import { getCircleAllWalletBalances } from "@/data/circle/user-controlled/wallet";
 
 export default async function TransferPage() {
   const session = await getServerSession(authOptions);
