@@ -15,7 +15,7 @@ import Avalance from "@/public/blockchain/avalanche.png";
 import { initialize_transfer } from "@/actions/user-controlled-wallets/initiaze_transfer";
 import useExecuteChallenge from "@/hooks/useExecuteChallenge";
 import { getCircleTransactionsList } from "@/data/circle/user-controlled/transactions";
-import { AlertCircle, CircleCheck } from "lucide-react";
+import { AlertCircle, CircleCheck, InfoIcon } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -31,6 +31,11 @@ import {
   checkTransferStateDEV,
   transferTokenDEV,
 } from "@/actions/developer-contolled-wallets";
+import {
+  approve_usdc,
+  burn_usdc,
+  mint_usdc,
+} from "@/actions/developer-contolled-wallets/cctp";
 
 interface TransferProps {
   wallets: any;
@@ -48,6 +53,8 @@ export default function Transfer({ wallets }: TransferProps) {
   const [toAddress, setToAddress] = useState("");
 
   const [amount, setAmount] = useState(0);
+
+  const [cctpInfo, setCctpInfo] = useState<any>();
 
   const getTransferDetails = async () => {
     const transactions = await getCircleTransactionsList(
@@ -73,20 +80,23 @@ export default function Transfer({ wallets }: TransferProps) {
       return;
     }
     const destinationAddress = toAddress ? toAddress : toAccount.address;
-    if (fromAccount.address === destinationAddress) {
-      setFormError("You can't transfer to the same address.");
-      return;
-    }
-    if (fromAccount.blockchain !== toAccount.blockchain) {
-      setFormError("You can't transfer between different blockchains.");
-      return;
-    }
+
     if (fromAccount.balance < amount) {
       setFormError("You don't have enough balance to transfer this amount.");
       return;
     }
 
     if (session?.data?.user?.custodyType === "END_USER") {
+      if (fromAccount.address === destinationAddress) {
+        setFormError("You can't transfer to the same address.");
+        return;
+      }
+      if (fromAccount.blockchain !== toAccount.blockchain) {
+        setFormError(
+          "You can't transfer between different blockchains. You can use develepor controlled wallets for this purpose. But soon we will activate the Cross Chain Payment Protocol - CCTP."
+        );
+        return;
+      }
       const response = await initialize_transfer(
         fromAccount.userId,
         amount.toString(),
@@ -119,17 +129,48 @@ export default function Transfer({ wallets }: TransferProps) {
 
       setFormError("");
     } else {
-      const response: any = await transferTokenDEV(
-        fromAccount.walletId,
-        destinationAddress,
-        amount.toString()
-      );
-      // response:  { id: '4e93c300-521d-57f8-ba7d-ba718b48e84e', state: 'INITIATED' }
-      const txDetails = await checkTransferStateDEV(response.id);
-      setTxDetails(txDetails);
-      if (!response) {
-        setFormError("Failed to initialize transfer");
-        return;
+      if (fromAccount.blockchain === toAccount.blockchain) {
+        const response: any = await transferTokenDEV(
+          fromAccount.walletId,
+          destinationAddress,
+          amount.toString()
+        );
+        // response:  { id: '4e93c300-521d-57f8-ba7d-ba718b48e84e', state: 'INITIATED' }
+        const txDetails = await checkTransferStateDEV(response.id);
+        setTxDetails(txDetails);
+        if (!response) {
+          setFormError("Failed to initialize transfer");
+          return;
+        }
+      } else {
+        console.log("cctp ffunctions will be called here");
+        setCctpInfo(
+          "Cross Chain Payment Protocol might be take a while... Please wait."
+        );
+        console.log("fromAccount: ", fromAccount.walletId);
+        console.log("FROM ACcount: ", fromAccount.blockchain);
+        await approve_usdc(fromAccount.walletId, fromAccount.blockchain);
+        const burnId = await burn_usdc(
+          fromAccount.walletId,
+          destinationAddress,
+          amount.toString(),
+          toAccount.blockchain
+        );
+        console.log("burnId: ", burnId);
+        const response: any = await mint_usdc(
+          toAccount.walletId,
+          burnId,
+          toAccount.blockchain
+        );
+        console.log("response: ", response);
+        if (!response) {
+          setFormError("Failed to initialize transfer");
+          setCctpInfo(null);
+          return;
+        }
+        setCctpInfo(
+          "Cross Chain Payment Protocol initiated successfully. Please wait for the transaction to complete. This might take a while."
+        );
       }
     }
     return;
@@ -150,9 +191,9 @@ export default function Transfer({ wallets }: TransferProps) {
             >
               <TabsList className="flex flex-col w-full h-full gap-y-2 ">
                 <ScrollArea className="w-full h-[250px]">
-                  {wallets.map((wallet: any) => (
+                  {wallets.map((wallet: any, index: number) => (
                     <TabsTrigger
-                      key={wallet.address}
+                      key={`${wallet.address}-${index}`}
                       className="w-full py-3 data-[state=active]:bg-orange-600"
                       value={wallet}
                     >
@@ -240,9 +281,9 @@ export default function Transfer({ wallets }: TransferProps) {
             >
               <TabsList className="flex flex-col w-full h-full gap-y-2 ">
                 <ScrollArea className="w-full h-[250px]">
-                  {wallets.map((wallet: any) => (
+                  {wallets.map((wallet: any, index: number) => (
                     <TabsTrigger
-                      key={wallet.address}
+                      key={`${wallet.id}-${index}`}
                       className="w-full py-3 data-[state=active]:bg-orange-600"
                       value={wallet}
                     >
@@ -336,6 +377,13 @@ export default function Transfer({ wallets }: TransferProps) {
               Your transaction was completed successfully.
               {txDetails.transactionHash}
             </AlertDescription>
+          </Alert>
+        )}
+        {cctpInfo && (
+          <Alert variant="default" className="border-slate-500 border-2">
+            <InfoIcon className="h-4 w-4" />
+            <AlertTitle className="text-white">IMPORTANT!</AlertTitle>
+            <AlertDescription>{cctpInfo}</AlertDescription>
           </Alert>
         )}
 
