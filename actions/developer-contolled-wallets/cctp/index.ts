@@ -16,8 +16,6 @@ import {
 
 const Web3 = require("web3").default;
 
-const web3 = new Web3(`${process.env.RPC_URL}`);
-
 const get_cipher_text = async () => {
   let ciphertext = await generate_ciphertext(
     `${process.env.CIRCLE_ENTITY_SECRET}`

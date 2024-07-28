@@ -91,50 +91,6 @@ export const createWalletDEV = async (
   });
 };
 
-// Get Wallets
-const get_wallets = async () => {
-  try {
-    const response = await circleDeveloperSdk.listWallets({});
-  } catch (error) {
-    console.log("error:", error);
-  }
-};
-
-// Get Specific Wallet
-const get_wallet = async () => {
-  try {
-    const response = await circleDeveloperSdk.getWallet({
-      id: `${process.env.WALLET_ID_1}`,
-    });
-  } catch (error) {
-    console.log("error:", error);
-  }
-};
-
-// List wallet transactions
-const wallet_transactions = async () => {
-  const response = await circleDeveloperSdk.listTransactions({
-    walletIds: [`${process.env.WALLET_ID_1}`],
-  });
-
-  console.log("response: ", response.data);
-  console.log(
-    "amount: ",
-    response.data?.transactions && response.data.transactions[0]?.amounts
-  );
-};
-
-// Get wallet balance
-const get_balance = async () => {
-  const response = await circleDeveloperSdk.getWalletTokenBalance({
-    id: `${process.env.WALLET_ID_1}`,
-  });
-
-  console.log("response: ", response.data);
-  console.log("Matic token id: ", response.data?.tokenBalances?.[0]?.token?.id);
-  console.log("USDC token id: ", response.data?.tokenBalances?.[1]?.token?.id);
-};
-
 // Transfer Token
 export const transferTokenDEV = async (
   walletId: string,
@@ -169,17 +125,3 @@ export const checkTransferStateDEV = async (id: string) => {
 
   return response.data;
 };
-
-// // Exports
-// module.exports = {
-//   generate_secret,
-//   generate_ciphertext,
-//   create_wallet_set,
-//   create_wallet,
-//   get_wallets,
-//   get_wallet,
-//   wallet_transactions,
-//   get_balance,
-//   transfer_token,
-//   check_transfer_state,
-// };

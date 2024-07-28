@@ -23,18 +23,6 @@ export const getCircleWalletsDEV = async (walletSetId: string) => {
   }
 };
 
-// Get Specific Wallet
-const get_wallet = async () => {
-  try {
-    const response = await circleDeveloperSdk.getWallet({
-      id: `${process.env.WALLET_ID_1}`,
-    });
-    console.log(response.data);
-  } catch (error) {
-    console.log("error:", error);
-  }
-};
-
 // Get wallet balance
 export const getCircleTokenBalanceDEV = async (walletId: string) => {
   const response = await circleDeveloperSdk.getWalletTokenBalance({
