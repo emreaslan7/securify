@@ -1,4 +1,8 @@
 "use server";
+import {
+  CIRCLE_USDC_CONTRACT_ADDRESS_AMOY,
+  CIRCLE_USDC_CONTRACT_ADDRESS_SEPOLIA,
+} from "@/actions/developer-contolled-wallets/cctp/constant";
 import { acquire_session_token } from "@/actions/user-controlled-wallets/createUser/steps/acquire_session_token";
 import axios from "axios";
 
@@ -52,9 +56,15 @@ export const getCircleTokenBalances = async (
 ) => {
   const acquireSession = await acquire_session_token(userId);
 
+  const walletInfo = await getCircleWallet(userId, walletId);
+  const tokenAddress =
+    walletInfo?.blockchain === "ETH-SEPOLIA"
+      ? CIRCLE_USDC_CONTRACT_ADDRESS_SEPOLIA
+      : CIRCLE_USDC_CONTRACT_ADDRESS_AMOY;
+
   const options = {
     method: "GET",
-    url: `https://api.circle.com/v1/w3s/wallets/${walletId}/balances?tokenAddress=0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582`,
+    url: `https://api.circle.com/v1/w3s/wallets/${walletId}/balances?tokenAddress=${tokenAddress}`,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,

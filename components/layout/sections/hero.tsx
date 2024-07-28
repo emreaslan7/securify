@@ -16,28 +16,33 @@ export const HeroSection = () => {
             <span className="mr-2 text-primary">
               <Badge>New</Badge>
             </span>
-            <span> Design is out now! </span>
+            <span> Transfer USDC between blockchains </span>
           </Badge>
 
           <div className="max-w-screen-md mx-auto text-center text-4xl md:text-6xl font-bold">
             <h1>
-              Experiece the
+              Manage Your <br />
               <span className="text-transparent px-2 bg-gradient-to-r from-[#D247BF] to-primary bg-clip-text">
-                Shadcn
+                Organization Funds
               </span>
-              landing page
+              <br />
+              Ease and Transparency
             </h1>
           </div>
 
-          <p className="max-w-screen-sm mx-auto text-xl text-muted-foreground">
-            {`We're more than just a tool, we're a community of passionate
-            creators. Get access to exclusive resources, tutorials, and support.`}
+          <p className="max-w-screen-lg mx-auto text-xl text-muted-foreground">
+            {`Forget about complex blockchain transactions. We've handled the complexity, so you can focus on managing your organization's funds with complete transparency.`}
           </p>
 
-          <div className="space-y-4 md:space-y-0 md:space-x-4">
+          <div className="space-y-4 md:space-y-0 md:space-x-4 flex items-center justify-center">
             <Button className="w-5/6 md:w-1/4 font-bold group/arrow">
-              Get Started
-              <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
+              <Link
+                href={"/signup"}
+                className="flex items-center justify-center"
+              >
+                <span>Get Started</span>
+                <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
+              </Link>
             </Button>
 
             <Button
@@ -46,7 +51,7 @@ export const HeroSection = () => {
               className="w-5/6 md:w-1/4 font-bold"
             >
               <Link
-                href="https://github.com/nobruf/shadcn-landing-page.git"
+                href="https://github.com/emreaslan7/securify"
                 target="_blank"
               >
                 Github respository
@@ -62,9 +67,7 @@ export const HeroSection = () => {
             height={1200}
             className="w-full md:w-[1200px] mx-auto rounded-lg relative rouded-lg leading-none flex items-center border border-t-2 border-secondary  border-t-primary/30"
             src={
-              theme === "light"
-                ? "/hero-image-light.jpeg"
-                : "/hero-image-dark.jpeg"
+              theme === "light" ? "/dashboard_light.png" : "/dashboard_dark.png"
             }
             alt="dashboard"
           />

@@ -10,28 +10,28 @@ interface BenefitsProps {
 
 const benefitList: BenefitsProps[] = [
   {
-    icon: "Blocks",
-    title: "Build Brand Trust",
+    icon: "LayoutDashboard",
+    title: "Unified Wallet Management",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. A odio velit cum aliquam. Natus consectetur dolores.",
+      "Effortlessly manage all your wallets from a single, intuitive dashboard. Gain complete control over your assets.",
   },
   {
-    icon: "LineChart",
-    title: "More Leads",
+    icon: "BookOpenText",
+    title: "Unmatched Transparency",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. A odio velit cum aliquam, natus consectetur.",
+      "Benefit from the transparency of blockchain technology. Every transaction is recorded and auditable, providing complete visibility into your wallet activities",
   },
   {
-    icon: "Wallet",
-    title: "Higher Conversions",
+    icon: "LandPlot",
+    title: "User-Friendly Interface",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus consectetur. A odio velit cum aliquam",
+      "Enjoy a seamless user experience without the complexities of blockchain. Our platform simplifies wallet management for everyone.",
   },
   {
-    icon: "Sparkle",
-    title: "Test Marketing Ideas",
+    icon: "Globe",
+    title: "Seamless Cross-Chain Payments",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. A odio velit cum aliquam. Natus consectetur dolores.",
+      "Send and receive assets across multiple blockchains with ease. Our platform simplifies cross-chain transactions.",
   },
 ];
 
@@ -43,12 +43,11 @@ export const BenefitsSection = () => {
           <h2 className="text-lg text-primary mb-2 tracking-wider">Benefits</h2>
 
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Your Shortcut to Success
+            Your Gateway to Transparent and Secure Finance
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Non
-            ducimus reprehenderit architecto rerum similique facere odit
-            deleniti necessitatibus quo quae.
+            Discover the benefits of our innovative platform and revolutionize
+            the way you manage your finances.
           </p>
         </div>
 

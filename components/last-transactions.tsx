@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import UsdcIcon from "@/public/blockchain/usdc.png";
 import PolygonIcon from "@/public/blockchain/polygon.png";
+import EthIcon from "@/public/blockchain/ethereum.png";
 import { MoveDown, MoveUp } from "lucide-react";
 import truncateAddress from "@/helpers/truncateAddress";
 import { getTimeAgo } from "@/helpers/getTimeAgo";
@@ -36,7 +37,7 @@ export default function LastTransactions({ ...props }: LastTransactionsProps) {
       </div>
       <div className="text-xs">
         <Image
-          src={props.blockchain === "MATIC-AMOY" ? PolygonIcon : UsdcIcon}
+          src={props.blockchain === "MATIC-AMOY" ? PolygonIcon : EthIcon}
           alt="blockchain icon"
           width={20}
           height={20}

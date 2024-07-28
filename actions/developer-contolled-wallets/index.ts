@@ -146,6 +146,7 @@ export const transferTokenDEV = async (
       walletId: `${walletId}`,
       tokenId: `36b6931a-873a-56a8-8a27-b706b17104ee`,
       destinationAddress: `${destinationAddress}`,
+      // @ts-ignore
       amounts: [amount],
       fee: {
         type: "level",

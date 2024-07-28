@@ -1,4 +1,8 @@
 "use server";
+import {
+  CIRCLE_USDC_CONTRACT_ADDRESS_AMOY,
+  CIRCLE_USDC_CONTRACT_ADDRESS_SEPOLIA,
+} from "@/actions/developer-contolled-wallets/cctp/constant";
 import { initiateDeveloperControlledWalletsClient } from "@circle-fin/developer-controlled-wallets";
 
 // Setup developer sdk
@@ -35,7 +39,10 @@ const get_wallet = async () => {
 export const getCircleTokenBalanceDEV = async (walletId: string) => {
   const response = await circleDeveloperSdk.getWalletTokenBalance({
     id: `${walletId}`,
-    tokenAddresses: ["0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582"],
+    tokenAddresses: [
+      CIRCLE_USDC_CONTRACT_ADDRESS_AMOY,
+      CIRCLE_USDC_CONTRACT_ADDRESS_SEPOLIA,
+    ],
   });
 
   return response.data?.tokenBalances?.[0]?.amount;

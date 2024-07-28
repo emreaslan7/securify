@@ -1,5 +1,3 @@
-// create RPC URL CONSTANTS
-
 export const AMOY_RPC_URL = `https://polygon-amoy.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`;
 export const SEPOLIA_RPC_URL = `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`;
 

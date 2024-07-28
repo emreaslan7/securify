@@ -400,15 +400,6 @@ export default function Transfer({ wallets }: TransferProps) {
               covered by us.
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="item-2">
-            <AccordionTrigger>
-              Why am I not able to transfer to a different blockchain?
-            </AccordionTrigger>
-            <AccordionContent>
-              We have not activated the Cross Chain Payment Protocol - CCTP yet.
-              Stay tuned!
-            </AccordionContent>
-          </AccordionItem>
         </Accordion>
       </div>
     </div>
