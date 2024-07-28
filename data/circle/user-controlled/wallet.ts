@@ -136,7 +136,7 @@ export const getCircleAllTokenBalances = async (userId: string) => {
       userId,
       userWallets[i].id
     );
-    allTokenBalances += Number(tokenBalances);
+    if (tokenBalances) allTokenBalances += Number(tokenBalances);
   }
 
   return allTokenBalances;
@@ -145,7 +145,8 @@ export const getCircleAllTokenBalances = async (userId: string) => {
 export const updateCircleWallet = async (
   userId: string,
   walletId: string,
-  body: any
+  name: string,
+  refId: string
 ) => {
   const acquireSession = await acquire_session_token(userId);
 
@@ -158,12 +159,12 @@ export const updateCircleWallet = async (
       "X-User-Token": `${acquireSession?.userToken}`,
     },
     data: {
-      name: body.name,
-      refId: body.refId,
+      name,
+      refId,
     },
   };
 
-  axios
+  await axios
     .request(options)
     .then(function (response) {
       return response.data;

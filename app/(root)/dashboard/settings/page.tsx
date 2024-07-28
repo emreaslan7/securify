@@ -1,5 +1,3 @@
-"use client";
-
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import React from "react";
@@ -41,7 +39,7 @@ const data: Setting[] = [
   },
 ];
 
-export default function SettingsPage({}: Props) {
+export default async function SettingsPage({}: Props) {
   return (
     <div className="flex flex-col gap-5 w-full">
       <PageTitle title="Settings" />

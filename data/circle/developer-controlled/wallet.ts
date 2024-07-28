@@ -1,3 +1,4 @@
+"use server";
 import { initiateDeveloperControlledWalletsClient } from "@circle-fin/developer-controlled-wallets";
 
 // Setup developer sdk
@@ -85,5 +86,25 @@ export const getCircleWalletsBalancesDEV = async (walletSetId: string) => {
     return balances;
   } catch (error) {
     console.log("error:", error);
+  }
+};
+
+export const updateWalletDEV = async (
+  walletId: string,
+  name: string,
+  refId: string
+) => {
+  console.log("walletId:", walletId);
+  console.log("name:", name);
+  console.log("refId:", refId);
+  try {
+    const response = await circleDeveloperSdk.updateWallet({
+      id: walletId,
+      name,
+      refId,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.log("error:", error.response.data);
   }
 };

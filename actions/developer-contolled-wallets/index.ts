@@ -28,7 +28,7 @@ const fetch_public_key = async (secret: string) => {
 };
 
 // Generate ciphertext
-const generate_ciphertext = async (secret: string) => {
+export const generate_ciphertext = async (secret: string) => {
   const entitySecret = forge.util.hexToBytes(secret);
   const publicKey = forge.pki.publicKeyFromPem(
     (await fetch_public_key(secret as string)) || ""
@@ -39,6 +39,7 @@ const generate_ciphertext = async (secret: string) => {
       md: forge.md.sha256.create(),
     },
   });
+  console.log("encryptedData: ", forge.util.encode64(encryptedData));
   return forge.util.encode64(encryptedData);
 };
 

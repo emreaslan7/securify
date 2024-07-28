@@ -83,7 +83,7 @@ export default async function WalletsPage({}: Props) {
       <DataTable
         columns={columns}
         data={wallets?.map((wallet: any) => ({
-          id: truncateAddress(wallet.id),
+          id: wallet.id,
           network: wallet.blockchain,
           accountType: wallet.accountType,
           createDate: getTimeAgo(wallet.createDate),

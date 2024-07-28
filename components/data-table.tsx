@@ -17,6 +17,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "./ui/button";
+import { Pencil, Check, X } from "lucide-react";
+import { useState } from "react";
+import { updateWalletDEV } from "@/data/circle/developer-controlled/wallet";
+import { useSession } from "next-auth/react";
+import { revalidatePath } from "next/cache";
+import { updateCircleWallet } from "@/data/circle/user-controlled/wallet";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -27,12 +33,54 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const [editRowId, setEditRowId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Record<string, any>>({});
+
+  const session = useSession();
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  const handleEdit = (rowId: string, rowData: any) => {
+    setEditRowId(rowId);
+    setEditData(rowData);
+  };
+
+  const handleCancel = () => {
+    setEditRowId(null);
+    setEditData({});
+  };
+
+  const handleSave = async () => {
+    if (session.data?.user?.custodyType === "END_USER") {
+      await updateCircleWallet(
+        session.data.user.circleUserId,
+        editData.id,
+        editData.name,
+        editData.refId
+      );
+    } else {
+      await updateWalletDEV(editData.id, editData.name, editData.refId);
+    }
+
+    window.location.reload();
+    setEditRowId(null);
+    setEditData({});
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: string
+  ) => {
+    setEditData({
+      ...editData,
+      [field]: e.target.value,
+    });
+  };
 
   return (
     <div>
@@ -65,12 +113,49 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+                      {editRowId === row.id &&
+                      (cell.column.id === "name" ||
+                        cell.column.id === "refId") ? (
+                        <input
+                          value={editData[cell.column.id] || cell.getValue()}
+                          onChange={(e) => handleChange(e, cell.column.id)}
+                        />
+                      ) : (
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )
                       )}
                     </TableCell>
                   ))}
+                  <TableCell>
+                    {editRowId === row.id ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSave()}
+                        >
+                          <Check />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleCancel}
+                        >
+                          <X />
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(row.id, row.original)}
+                      >
+                        <Pencil />
+                      </Button>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
